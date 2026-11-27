@@ -20,7 +20,8 @@ RUN apk add --no-cache bash curl jq python3 py3-tzdata tzdata uv \
  && tar -xzf /tmp/bashio.tar.gz -C /tmp/bashio-src --strip-components=1 \
  && cp -r /tmp/bashio-src/lib /usr/lib/bashio/lib \
  && cp /tmp/bashio-src/lib/*.sh /usr/local/bin/ \
- && ln -sf /usr/lib/bashio/lib/bashio.sh /usr/local/bin/bashio \
+ && chmod +x /usr/local/bin/*.sh \
+ && ln -sf /usr/local/bin/bashio.sh /usr/local/bin/bashio \
  && rm -rf /tmp/bashio.tar.gz /tmp/bashio-src \
  && bashio --version
 COPY --from=build /out/omini /usr/local/bin/omini
