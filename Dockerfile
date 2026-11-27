@@ -19,10 +19,7 @@ RUN go run ./internal/appicons/gen -bundle \
     go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o /out/omini ./cmd/omini
 
 FROM ${BUILD_FROM}
-RUN apk add --no-cache python3 py3-pip tzdata \
- && pip3 install --no-cache-dir uv \
- || (apk add --no-cache uv) \
- || true
+RUN apk add --no-cache python3 py3-tzdata tzdata uv || apk add --no-cache python3 tzdata
 COPY --from=build /out/omini /usr/local/bin/omini
 ENV OMINI_DATA_DIR=/data/omini \
     OMINI_ADDR=:8080 \
