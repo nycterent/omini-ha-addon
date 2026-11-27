@@ -1,23 +1,19 @@
-# Build args come from the Supervisor (BUILD_ARCH etc.). We build on stock
-# Alpine images from Docker Hub because ghcr.io anonymous pulls are 403-blocked
-# on this network; the HA add-on base image is therefore not used.
+# Build args come from the Supervisor. Base images come from Docker Hub
+# (ghcr.io is 403-blocked on this network). The omini source is cloned from
+# upstream at a pinned tag — the add-on repo contains packaging only.
 FROM golang:1.25-alpine AS build
-ARG TARGETOS TARGETARCH VERSION=dev
+ARG TARGETOS TARGETARCH
+ARG OMINI_REF=v1.11.1
 RUN apk add --no-cache nodejs npm git
 WORKDIR /src
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-# Build the web UI first (it is embedded into the Go binary)
-RUN cd web && npm ci --no-audit --no-fund && npm run build && cd .. \
-    && cp -r web/dist ./web/dist
+RUN git clone --depth 1 --branch ${OMINI_REF} https://github.com/riccardoalv/omini.git .
+RUN cd web && npm ci --no-audit --no-fund && npm run build
 RUN go run ./internal/appicons/gen -bundle \
  && go run ./internal/geoip/gen \
  && CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
-    go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o /out/omini ./cmd/omini
+    go build -trimpath -ldflags "-s -w -X main.version=${OMINI_REF}" -o /out/omini ./cmd/omini
 
 FROM alpine:3.21
-ARG BUILD_ARCH
 ADD https://github.com/hassio-addons/bashio/archive/refs/heads/main.tar.gz /tmp/bashio.tar.gz
 RUN apk add --no-cache bash curl jq python3 py3-tzdata tzdata uv \
  && mkdir -p /usr/lib/bashio \
