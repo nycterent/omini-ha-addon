@@ -1,9 +1,10 @@
 # Build args come from the Supervisor. Base images come from Docker Hub
 # (ghcr.io is 403-blocked on this network). The omini source is cloned from
 # upstream at a pinned tag — the add-on repo contains packaging only.
-FROM golang:1.25-alpine AS build
+FROM golang:1.27-alpine AS build
 ARG TARGETOS TARGETARCH
 ARG OMINI_REF=v1.11.1
+ENV GOTOOLCHAIN=auto
 RUN apk add --no-cache nodejs npm git
 WORKDIR /src
 RUN git clone --depth 1 --branch ${OMINI_REF} https://github.com/riccardoalv/omini.git .
