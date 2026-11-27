@@ -30,4 +30,3 @@ options:
   omini_nmap: "install"
 schema:
   omini_nmap: list(off|install)
-image: local/{arch}-omini
