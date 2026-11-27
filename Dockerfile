@@ -19,14 +19,13 @@ RUN apk add --no-cache bash curl jq python3 py3-tzdata tzdata uv \
  && mkdir -p /usr/lib/bashio /tmp/bashio-src \
  && tar -xzf /tmp/bashio.tar.gz -C /tmp/bashio-src --strip-components=1 \
  && cp -r /tmp/bashio-src/lib /usr/lib/bashio/lib \
- && install -m 0755 /tmp/bashio-src/bashio /usr/lib/bashio/bashio \
- && ln -sf /usr/lib/bashio/bashio /usr/local/bin/bashio \
+ && ln -sf /usr/lib/bashio/lib/bashio.sh /usr/local/bin/bashio \
  && rm -rf /tmp/bashio.tar.gz /tmp/bashio-src \
- && /usr/lib/bashio/bashio --version
+ && bashio --version
 COPY --from=build /out/omini /usr/local/bin/omini
 COPY run.sh /
 RUN chmod +x /run.sh
 ENV OMINI_DATA_DIR=/data/omini \
     OMINI_ADDR=:8080 \
     UV_PYTHON_DOWNLOADS=never
-CMD ["bashio", "/run.sh"]
+CMD ["/usr/bin/env", "bashio", "/run.sh"]
