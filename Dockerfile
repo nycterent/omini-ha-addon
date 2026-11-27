@@ -16,12 +16,13 @@ RUN go run ./internal/appicons/gen -bundle \
 FROM alpine:3.21
 ADD https://github.com/hassio-addons/bashio/archive/refs/heads/main.tar.gz /tmp/bashio.tar.gz
 RUN apk add --no-cache bash curl jq python3 py3-tzdata tzdata uv \
- && mkdir -p /usr/lib/bashio \
- && tar -xzf /tmp/bashio.tar.gz --strip 1 -C /tmp \
- && mv /tmp/lib /usr/lib/bashio/lib \
- && mv /tmp/bashio /usr/lib/bashio/bashio \
+ && mkdir -p /usr/lib/bashio /tmp/bashio-src \
+ && tar -xzf /tmp/bashio.tar.gz -C /tmp/bashio-src --strip-components=1 \
+ && cp -r /tmp/bashio-src/lib /usr/lib/bashio/lib \
+ && install -m 0755 /tmp/bashio-src/bashio /usr/lib/bashio/bashio \
  && ln -sf /usr/lib/bashio/bashio /usr/local/bin/bashio \
- && rm /tmp/bashio.tar.gz
+ && rm -rf /tmp/bashio.tar.gz /tmp/bashio-src \
+ && /usr/lib/bashio/bashio --version
 COPY --from=build /out/omini /usr/local/bin/omini
 COPY run.sh /
 RUN chmod +x /run.sh
