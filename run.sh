@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bashio
 # Omini add-on for Home Assistant: runs the upstream binary on :8080
 # with host networking so ARP/ping/mDNS/SSDP reach the LAN.
 
