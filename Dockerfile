@@ -15,20 +15,11 @@ RUN go run ./internal/appicons/gen -bundle \
     go build -trimpath -ldflags "-s -w -X main.version=${OMINI_REF}" -o /out/omini ./cmd/omini
 
 FROM alpine:3.21
-ADD https://github.com/hassio-addons/bashio/archive/refs/heads/main.tar.gz /tmp/bashio.tar.gz
-RUN apk add --no-cache bash curl jq python3 py3-tzdata tzdata uv \
- && mkdir -p /usr/lib/bashio /tmp/bashio-src \
- && tar -xzf /tmp/bashio.tar.gz -C /tmp/bashio-src --strip-components=1 \
- && cp -r /tmp/bashio-src/lib /usr/lib/bashio/lib \
- && cp /tmp/bashio-src/lib/*.sh /usr/local/bin/ \
- && chmod +x /usr/local/bin/*.sh \
- && ln -sf /usr/local/bin/bashio.sh /usr/local/bin/bashio \
- && rm -rf /tmp/bashio.tar.gz /tmp/bashio-src \
- && bashio --version
+RUN apk add --no-cache bash curl jq python3 py3-tzdata tzdata uv
 COPY --from=build /out/omini /usr/local/bin/omini
 COPY run.sh /
 RUN chmod +x /run.sh
 ENV OMINI_DATA_DIR=/data/omini \
     OMINI_ADDR=:8080 \
     UV_PYTHON_DOWNLOADS=never
-CMD ["/usr/bin/env", "bashio", "/run.sh"]
+CMD ["/bin/bash", "/run.sh"]
