@@ -1,3 +1,12 @@
+# Build args for the Supervisor's builder. Base images come from Docker Hub
+# (ghcr.io is 403-blocked on this network). The Supervisor injects
+# BUILD_ARCH/BUILD_FROM; our Dockerfile ignores BUILD_FROM and pins
+# golang:1.25-alpine / alpine:3.21 directly.
 build_from:
-  aarch64: ghcr.io/home-assistant/aarch64-addon-base:latest
-  amd64: ghcr.io/home-assistant/amd64-addon-base:latest
+  aarch64: alpine:3.21
+  amd64: alpine:3.21
+  armhf: alpine:3.21
+  armv7: alpine:3.21
+  i386: alpine:3.21
+args:
+  VERSION: "1.0.0"
